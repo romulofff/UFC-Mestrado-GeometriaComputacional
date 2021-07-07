@@ -30,13 +30,34 @@ def norma(x):
 
 
 def distancia(x, y):
+    """Returns the distance between vectors x and y.
+
+    Args:
+        x (list): list containing points from vector x.
+        y (list): list containing points from vector y.
+
+    Returns:
+        [float]: [the distance between vectors x and y]
+    """
     z = []
     for i in range(len(x)):
         z.append(x[i]-y[i])
     return norma(z)
 
 
-def angulo(x, y):
+def angulo(x, y, degrees=True):
+    """Returns the angle between vectors x and y.
+
+    Args:
+        x (list): list containing points from vector x.
+        y (list): list containing points from vector y.
+        degrees (bool): if the result should be in degrees or radians, defaults to True.
+    Returns:
+        float: the angle between the two vectors
+    """
+
+    if not degrees:
+        return math.acos(prodescalar(x, y)/(norma(x)*norma(y)))
     return math.acos(prodescalar(x, y)/(norma(x)*norma(y)))*(180/math.pi)
 
 
