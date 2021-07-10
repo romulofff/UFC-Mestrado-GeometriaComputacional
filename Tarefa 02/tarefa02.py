@@ -125,6 +125,20 @@ def intersect(a, b, c, d):
     return r1 and r2
 
 
+def area(x, y):
+    if len(x) == 2:
+        return abs(prodvetorial(x, y))
+    return norma(prodvetorial(x, y))
+
+
+def antiHorario(listaDePontos):
+    res = 0
+    for i in range(len(listaDePontos)-1):
+        res += prodvetorial(listaDePontos[i], listaDePontos[i+1])
+    res += prodvetorial(listaDePontos[0], listaDePontos[-1])
+    return 0.5*res > 0
+
+
 # print(somavetorial([0, 2, 3], [1, 2, 0]))
 # print(multescalar(2, [1, 1]))
 # print(prodescalar([1, 2, 3], [3, 2, 1]))
@@ -149,3 +163,8 @@ def intersect(a, b, c, d):
 # print("Interseção dos segimentos de retas: ",intersect((0, 0), (2, 2), (0, 1), (2, 1)))
 # print("Interseção dos segimentos de retas: ",intersect((0, 0), (2, 2), (0, 6), (9, -3)))
 # print("Interseção dos segimentos de retas: ",intersect((0, -2), (6, 4), (0, 6), (9, -3)))
+
+print(antiHorario([(0, 0), (0, 1), (2, 0)]))
+print(antiHorario([(0, 0), (2, 0), (0, 1)]))
+print(area((0,1), (2,0)))
+print(area((0,1,3), (2,0,4)))
