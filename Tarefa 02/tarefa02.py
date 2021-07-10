@@ -7,10 +7,6 @@ class Point():
         self.y = y
 
 
-# class Polygon():
-
-
-
 class Gcrf():
 
     def somavetorial(self, x, y):
@@ -104,8 +100,8 @@ class Gcrf():
         return 8-(-x[1]/x[0])
 
     def pseudoAngulo2(self, x, y):
-        print("PSEUDOS", self.pseudoAnguloOrientado(
-            x), self.pseudoAnguloOrientado(y))
+        # print("PSEUDOS", self.pseudoAnguloOrientado(
+            # x), self.pseudoAnguloOrientado(y))
         return self.pseudoAnguloOrientado(x)-self.pseudoAnguloOrientado(y)
 
     def prodvetorial(self, x, y):
@@ -121,9 +117,11 @@ class Gcrf():
         cb = self.subtrvetorial(b, c)
         cd = self.subtrvetorial(d, c)
 
-        r1 = self.prodvetorial(ab, ac)*self.prodvetorial(ab, ad) < 0
-        r2 = self.prodvetorial(cd, ca)*self.prodvetorial(cd, cb) < 0
-        return (r1, r2), r1 and r2
+        r1 = self.prodvetorial(ab, ac)*self.prodvetorial(ab, ad)
+        # r1 = self.prodvetorial(ab, ac)*self.prodvetorial(ab, ad) < 0
+        r2 = self.prodvetorial(cd, ca)*self.prodvetorial(cd, cb)
+        # r2 = self.prodvetorial(cd, ca)*self.prodvetorial(cd, cb) < 0
+        return (r1, r2), r1 < 0 and r2 < 0
 
     def area(self, x, y):
         if len(x) == 2:
@@ -137,18 +135,18 @@ class Gcrf():
         res += self.prodvetorial(listaDePontos[0], listaDePontos[-1])
         return 0.5*res > 0
 
-    def slope(self, p1:Point, p2:Point):
+    def slope(self, p1: Point, p2: Point):
 
         return (p2.y - p1.y) / (p2.x - p1.x)
 
     def pip(self, p: Point, poly) -> bool:
         """ Determine if the point is in the polygon.
-        
+
         Args:
             x -- The x coordinates of point.
             y -- The y coordinates of point.
             poly -- a list of tuples [(x, y), (x, y), ...]
-        
+
         Returns:
             True if the point is in the path or is a corner or on the boundary"""
 
@@ -168,8 +166,30 @@ class Gcrf():
         return result
 
 
-if __name__ == '__main__':
+    def rotationIndex(self, p: Point, poly: list):
+        j = len(poly)-1
+        rotIndex = 0
+        for i in range(len(poly)):
+            ppi = self.subtrvetorial(p, poly[j])
+            ppi1 = self.subtrvetorial(p, poly[i])
+            print("ppi:", ppi, "pppi1", ppi1)
+            rotIndex += self.pseudoAngulo2(ppi, ppi1)
+            print("rotIndex",rotIndex)
+            j = i
+        # print(rotIndex)
 
+        rotIndex *= 1/(2*math.pi)
+        print(rotIndex)
+        if rotIndex == 0:
+            return False
+        if abs(rotIndex) == 1:
+            return True
+        return rotIndex
+
+
+
+
+if __name__ == '__main__':
 
     gc = Gcrf()
 
@@ -191,23 +211,29 @@ if __name__ == '__main__':
     print(gc.pseudoAngulo2([1, 0], [0, 1]))
 
     print("Se positivo a está a esquerda de b:",
-        gc.pseudoAngulo2([1, 1], [1, -1]))
+          gc.pseudoAngulo2([1, 1], [1, -1]))
     print("Se positivo a está a esquerda de b:",
-        gc.pseudoAngulo2([1, -1], [1, 1]))
+          gc.pseudoAngulo2([1, -1], [1, 1]))
 
-    print("Interseção dos segimentos de retas: ",
-        gc.intersect((0, 0), (2, 2), (0, 1), (2, 1)))
-    print("Interseção dos segimentos de retas: ",
-        gc.intersect((0, 0), (2, 2), (0, 1), (2, 1)))
-    print("Interseção dos segimentos de retas: ",
-        gc.intersect((0, 0), (2, 2), (0, 6), (9, -3)))
-    print("Interseção dos segimentos de retas: ",
-        gc.intersect((0, -2), (6, 4), (0, 6), (9, -3)))
+    print("Interseção dos segmentos de retas: ",
+          gc.intersect((0, 0), (2, 2), (0, 1), (2, 1)))
+    print("Interseção dos segmentos de retas: ",
+          gc.intersect((0, 0), (2, 2), (0, 1), (2, 1)))
+    print("Interseção dos segmentos de retas: ",
+          gc.intersect((0, 0), (2, 2), (0, 6), (9, -3)))
+    print("Interseção dos segmentos de retas: ",
+          gc.intersect((0, -2), (6, 4), (0, 6), (9, -3)))
 
     print(gc.antiHorario([(0, 0), (0, 1), (2, 0)]))
     print(gc.antiHorario([(0, 0), (2, 0), (0, 1)]))
     print(gc.area((0, 1), (2, 0)))
     print(gc.area((0, 1, 3), (2, 0, 4)))
 
-    print("PIP:", gc.pip(Point(0,0), [Point(-1,1), Point(1,1), Point(1,-1), Point(-1,-1)]))
-    print("PIP:", gc.pip(Point(2,2), [Point(-1,1), Point(1,1), Point(1,-1), Point(-1,-1)]))
+    print("PIP:", gc.pip(Point(0, 0), [
+          Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)]))
+    print("PIP:", gc.pip(Point(2, 2), [
+          Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)]))
+    print("PIP:", gc.rotationIndex((0, 0), [
+          (-2, 2), (2, 2), (2, -2), (-2, -2)]))
+    # print("PIP:", gc.rotationIndex((2, 2), [
+    #       (-1, 1), (1, 1), (1, -1), (-1, -1)]))
