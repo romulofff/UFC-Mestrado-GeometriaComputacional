@@ -1,10 +1,22 @@
 import math
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 class Point():
     def __init__(self, x, y) -> None:
         self.x = x
         self.y = y
+
+    def __call__(self) -> tuple:
+        return (self.x, self.y)
+
+    def __str__(self) -> str:
+        return str((self.x, self.y))
+
+    def to_numpy(self):
+        return np.array([self.x, self.y])
 
 
 class Gcrf():
@@ -100,8 +112,6 @@ class Gcrf():
         return 8-(-x[1]/x[0])
 
     def pseudoAngulo2(self, x, y):
-        # print("PSEUDOS", self.pseudoAnguloOrientado(
-            # x), self.pseudoAnguloOrientado(y))
         return self.pseudoAnguloOrientado(x)-self.pseudoAnguloOrientado(y)
 
     def prodvetorial(self, x, y):
@@ -117,11 +127,12 @@ class Gcrf():
         cb = self.subtrvetorial(b, c)
         cd = self.subtrvetorial(d, c)
 
-        r1 = self.prodvetorial(ab, ac)*self.prodvetorial(ab, ad)
-        # r1 = self.prodvetorial(ab, ac)*self.prodvetorial(ab, ad) < 0
-        r2 = self.prodvetorial(cd, ca)*self.prodvetorial(cd, cb)
-        # r2 = self.prodvetorial(cd, ca)*self.prodvetorial(cd, cb) < 0
-        return (r1, r2), r1 < 0 and r2 < 0
+        # r1 = self.prodvetorial(ab, ac)*self.prodvetorial(ab, ad)
+        r1 = self.prodvetorial(ab, ac)*self.prodvetorial(ab, ad) < 0
+        # r2 = self.prodvetorial(cd, ca)*self.prodvetorial(cd, cb)
+        r2 = self.prodvetorial(cd, ca)*self.prodvetorial(cd, cb) < 0
+        # return (r1, r2), r1 < 0 and r2 < 0
+        return r1 and r2
 
     def area(self, x, y):
         if len(x) == 2:
@@ -165,28 +176,45 @@ class Gcrf():
             j = i
         return result
 
+    def starPolygon(self, points, jumps):
+        i = 0
+        starredPolygon = []
+        while i < jumps:
+            for j in range(i, len(points), jumps):
+                # print("Ponto adicionado j:",points[j]())
+                starredPolygon.append(points[j]())
+            # print("Ponto adicionado i:",points[i]())
+            starredPolygon.append(points[i]())
+            i += 1
 
-    def rotationIndex(self, p: Point, poly: list):
-        j = len(poly)-1
-        rotIndex = 0
-        for i in range(len(poly)):
-            ppi = self.subtrvetorial(p, poly[j])
-            ppi1 = self.subtrvetorial(p, poly[i])
-            print("ppi:", ppi, "pppi1", ppi1)
-            rotIndex += self.pseudoAngulo2(ppi, ppi1)
-            print("rotIndex",rotIndex)
-            j = i
-        # print(rotIndex)
+        return starredPolygon
 
-        rotIndex *= 1/(2*math.pi)
-        print(rotIndex)
-        if rotIndex == 0:
-            return False
-        if abs(rotIndex) == 1:
-            return True
-        return rotIndex
+    
+    def plotPolygon(self, points):
+        x, y = zip(*points)
+        plt.grid(0.9)
+        plt.plot(x, y, '-o')
+        plt.show()
 
 
+    # def rotationIndex(self, p: Point, poly: list):
+    #     j = len(poly)-1
+    #     rotIndex = 0
+    #     for i in range(len(poly)):
+    #         ppi = self.subtrvetorial(p, poly[j])
+    #         ppi1 = self.subtrvetorial(p, poly[i])
+    #         print("ppi:", ppi, "pppi1", ppi1)
+    #         rotIndex += self.pseudoAngulo2(ppi, ppi1)
+    #         print("rotIndex",rotIndex)
+    #         j = i
+    #     # print(rotIndex)
+    #     rotIndex *= 1/(2*math.pi)
+    #     print(rotIndex)
+    #     if rotIndex == 0:
+    #         return False
+    #     if abs(rotIndex) == 1:
+    #         return True
+    #     return rotIndex
 
 
 if __name__ == '__main__':
@@ -218,8 +246,6 @@ if __name__ == '__main__':
     print("Interseção dos segmentos de retas: ",
           gc.intersect((0, 0), (2, 2), (0, 1), (2, 1)))
     print("Interseção dos segmentos de retas: ",
-          gc.intersect((0, 0), (2, 2), (0, 1), (2, 1)))
-    print("Interseção dos segmentos de retas: ",
           gc.intersect((0, 0), (2, 2), (0, 6), (9, -3)))
     print("Interseção dos segmentos de retas: ",
           gc.intersect((0, -2), (6, 4), (0, 6), (9, -3)))
@@ -234,6 +260,18 @@ if __name__ == '__main__':
     print("PIP:", gc.pip(Point(2, 2), [
           Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)]))
     print("PIP:", gc.rotationIndex((0, 0), [
-          (-2, 2), (2, 2), (2, -2), (-2, -2)]))
-    # print("PIP:", gc.rotationIndex((2, 2), [
-    #       (-1, 1), (1, 1), (1, -1), (-1, -1)]))
+      (-2, 2), (2, 2), (2, -2), (-2, -2)]))
+    print("PIP:", gc.rotationIndex((2, 2), [
+          (-1, 1), (1, 1), (1, -1), (-1, -1)]))
+
+    poly = [Point(-1, 1), Point(1, 1), Point(3, 1),
+            Point(4, 2), Point(2.5, 3), Point(1.5, 3.5),
+            Point(1.5, 5), Point(-1.5, 5), Point(-0.8, 3.5), Point(-2, 2)]
+
+    # poly = [Point(0.2, 0.2), Point(0.3, 0.2), Point(0.4, 0.2),
+    #         Point(0.5, 0.3), Point(0.45, 0.4), Point(0.36, 0.45),
+    #         Point(0.38, 0.6), Point(0.18, 0.6), Point(0.26, 0.46), Point(0, 0.28)]
+    newpoly = [p() for p in poly]
+    newx, newy = zip(*newpoly)
+    starredPoly = gc.starPolygon(poly, 2)
+    gc.plotPolygon(starredPoly)
