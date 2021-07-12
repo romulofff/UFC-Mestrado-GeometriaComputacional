@@ -7,7 +7,8 @@ import numpy as np
 
 class Point():
     """Data structure of a point."""
-    def __init__(self, x, y) -> None:
+
+    def __init__(self, x, y, z=0) -> None:
         """Point object
 
         Args:
@@ -16,6 +17,13 @@ class Point():
         """
         self.x = x
         self.y = y
+        self.z = z
+
+    def __len__(self):
+        if self.z == 0:
+            return 2
+        else:
+            return 3
 
     def __call__(self) -> tuple:
         return (self.x, self.y)
@@ -29,29 +37,48 @@ class Point():
 
 class Gcrf():
 
-    def somavetorial(self, x, y):
+    def genPoly(self, n):
+        xn = np.random.random(n)
+        yn = np.random.random(n)
+        z = zip(xn, yn)
+        z = [Point(x, y) for x, y in z]
+        z = np.array(z)
+        angles = [self.anguloOrientado(i) for i in z]
+        indexes = np.argsort(angles)
+        z = z[indexes]
+        z = z.tolist()
+
+        return z
+      
+    def somavetorial(self, a, b):
+        if isinstance(a, Point):
+            return Point(a.x+b.x, a.y+b.y, a.z+b.z)
         z = []
-        for i in range(len(x)):
-            z.append(x[i]+y[i])
+        for i in range(len(a)):
+            z.append(a[i]+b[i])
         return z
 
-    def subtrvetorial(self, x, y):
+    def subtrvetorial(self, a, b):
+        if isinstance(a, Point):
+            return Point(a.x-b.x, a.y-b.y, a.z-b.z)
         z = []
-        for i in range(len(x)):
-            z.append(x[i]-y[i])
+        for i in range(len(a)):
+            z.append(a[i]-b[i])
         return z
 
     def multescalar(self, lamb: int, x: list) -> list:
+        if isinstance(a, Point):
+            return Point(a.x*lamb, a.y*lamb, a.z*lamb)
         z = []
         for i in range(len(x)):
             z.append(lamb*x[i])
         return z
 
-    def prodescalar(self, x, y):
-        z = []
-        for i in range(len(x)):
-            z.append(x[i]*y[i])
-        return sum(z)
+    def prodescalar(self, a, b):
+        res = []
+        for i in range(len(a)):
+            res.append(a[i]*b[i])
+        return sum(res)
 
     def norma(self, x):
         z = 0
@@ -90,6 +117,8 @@ class Gcrf():
         return math.acos(self.prodescalar(x, y)/(self.norma(x)*self.norma(y)))*(180/math.pi)
 
     def anguloOrientado(self, x, degrees=False):
+        if isinstance(x, Point):
+            x = x()
         mult = 1
         if x[1] < 0:
             mult = -1
@@ -103,6 +132,8 @@ class Gcrf():
         return (1-(self.prodescalar(x, y)/(self.norma(x)*self.norma(y))))*(180/math.pi)
 
     def pseudoAnguloOrientado(self, x):
+        if isinstance(x, Point):
+            x = x()
         if x[1] >= 0:
             if x[0] >= 0:
                 if x[0] >= x[1]:
@@ -218,7 +249,7 @@ class Gcrf():
         if type(points[0]) == Point:
             points = [p() for p in points]
         x, y = zip(*points)
-        plt.grid(0.9)
+        plt.grid(0.5)
         plt.plot(x, y, '-o')
         plt.show()
 
@@ -250,6 +281,11 @@ if __name__ == '__main__':
 
     gc = Gcrf()
 
+    # poly = gc.genPoly(9)    
+    # gc.plotPolygon(poly)
+
+    # z = (1, 2)
+    # a = Point(z)
     # print(gc.somavetorial([0, 2, 3], [1, 2, 0]))
     # print(gc.multescalar(2, [1, 1]))
     # print(gc.prodescalar([1, 2, 3], [3, 2, 1]))
@@ -267,56 +303,80 @@ if __name__ == '__main__':
     # print(gc.prodescalar([1, 2], [2, 1]))
     # print(gc.pseudoAngulo2([1, 0], [0, 1]))
 
-    # print("Se positivo a está a esquerda de b:",
-    #       gc.pseudoAngulo2([1, 1], [1, -1]))
-    # print("Se positivo a está a esquerda de b:",
-    #       gc.pseudoAngulo2([1, -1], [1, 1]))
+    # a = (1, 1)
+    # b = (1, -1)
+    # print("Se positivo {} está à esquerda de {}:".format(a, b),
+    #       gc.pseudoAngulo2(a, b))
+    # print("Se positivo {} está à esquerda de {}:".format(a, b),
+    #       gc.pseudoAngulo2(b, a))
 
-    print("Interseção dos segmentos de retas: ",
-          gc.intersect((0, 0), (2, 2), (0, 1), (2, 1)))
-    gc.plotSegment([[Point(0, 0), Point(2, 2)], [Point(0, 1), Point(2, 1)]])
+    # print("Interseção dos segmentos de retas: ",
+    #       gc.intersect((0, 0), (2, 2), (0, 1), (2, 1)))
+    # gc.plotSegment([[Point(0, 0), Point(2, 2)], [Point(0, 1), Point(2, 1)]])
 
-    print("Interseção dos segmentos de retas: ",
-          gc.intersect((0, 0), (2, 2), (0, 6), (9, -3)))
-    gc.plotSegment([[Point(0, 0), Point(2, 2)], [Point(0, 6), Point(9, -3)]])
+    # print("Interseção dos segmentos de retas: ",
+    #       gc.intersect((0, 0), (2, 2), (0, 6), (9, -3)))
+    # gc.plotSegment([[Point(0, 0), Point(2, 2)], [Point(0, 6), Point(9, -3)]])
 
-    print("Interseção dos segmentos de retas: ",
-          gc.intersect((0, -2), (6, 4), (0, 6), (9, -3)))
-    gc.plotSegment([[Point(0, -2), Point(6, 4)], [Point(0, 6), Point(9, -3)]])
+    # print("Interseção dos segmentos de retas: ",
+    #       gc.intersect((0, -2), (6, 4), (0, 6), (9, -3)))
+    # gc.plotSegment([[Point(0, -2), Point(6, 4)], [Point(0, 6), Point(9, -3)]])
 
-    print(gc.antiHorario([(0, 0), (0, 1), (2, 0)]))
-    print(gc.antiHorario([(0, 0), (2, 0), (0, 1)]))
-    print(gc.area((0, 1), (2, 0)))
-    print(gc.area((0, 1, 3), (2, 0, 4)))
+    # print("Anti-horário:", gc.antiHorario([(0, 0), (0, 1), (2, 0)]))
+    # print("Anti-horário:", gc.antiHorario([(0, 0), (2, 0), (0, 1)]))
 
-    print("PIP:", gc.pip(Point(0, 0), [
-          Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)]))
-    plt.scatter(0,0, c='g')
-    gc.plotPolygon([Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)])
+    # a = (0, 1)
+    # b = (2, 0)
+    # print("Área no R2, se > 0, o ângulo é orientado de {} para {}:".format(
+    #     a, b), gc.area(a, b))
 
-    print("PIP:", gc.pip(Point(2, 2), [
-          Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)]))
-    plt.scatter(2,2,c='g')
-    gc.plotPolygon([Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)])
+    # a = (0, 1, 3)
+    # b = (2, 0, 4)
+    # print("Área no R3, se > 0, o ângulo é orientado de {} para {}:".format(
+    #     a, b), gc.area(a, b))    
+    
+    # print("Point in Polygon:", gc.pip(Point(0, 0), [
+    #       Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)]))
+    # plt.scatter(0, 0, c='g')
+    # gc.plotPolygon([Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)])
 
-    poly = [Point(-1, 1), Point(1, 1), Point(3, 1),
-            Point(4, 2), Point(2.5, 3), Point(1.5, 3.5),
-            Point(1.5, 5), Point(-1.5, 5), Point(-0.8, 3.5), Point(-2, 2)]
+    # print("Point in Polygon:", gc.pip(Point(2, 2), [
+    #       Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)]))
+    # plt.scatter(2, 2, c='g')
+    # gc.plotPolygon([Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)])
+
+    # print("Point in Polygon - Rotation Index:", gc.rotationIndex(Point(0, 0), [
+    #       Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)]))
+    # plt.scatter(0, 0, c='g')
+    # gc.plotPolygon([Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)])
+
+    # print("Point in Polygon - Rotation Index:", gc.rotationIndex(Point(2, 2), [
+    #       Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)]))
+    # plt.scatter(2, 2, c='g')
+    # gc.plotPolygon([Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)])
+
+    # poly = [Point(-1, 1), Point(1, 1), Point(3, 1),
+    #         Point(4, 2), Point(2.5, 3), Point(1.5, 3.5),
+    #         Point(1.5, 5), Point(-1.5, 5), Point(-0.8, 3.5), Point(-2, 2)]
+
+    # starredPoly = gc.starPolygon(poly, 2)
+
+    # cx, cy = gc.centeroidnp(starredPoly)
+    # print("Centroid:", (cx, cy))
+    # print("Centroid in polygon:", gc.pip(Point(cx, cy), starredPoly))
+    # plt.grid(0.5)
+    # plt.scatter(cx, cy, c='g')
+    # gc.plotPolygon(starredPoly)
 
     # poly = [Point(0.2, 0.2), Point(0.3, 0.2), Point(0.4, 0.2),
     #         Point(0.5, 0.3), Point(0.45, 0.4), Point(0.36, 0.45),
     #         Point(0.38, 0.6), Point(0.18, 0.6), Point(0.26, 0.46), Point(0, 0.28)]
+    # starredPoly = gc.starPolygon(poly, 2)
 
-    starredPoly = gc.starPolygon(poly, 2)
-
-    cx, cy = gc.centeroidnp(starredPoly)
-    print("Centroid:", (cx, cy))
-    print("Centroid in polygon:", gc.pip(Point(cx, cy), starredPoly))
-    x, y = zip(*[p() for p in starredPoly])
-
-    plt.grid(0.9)
-    # plt.plot(x, y, '-o')
-    plt.scatter(cx, cy, c='g')
-    # plt.show()
-    gc.plotPolygon(starredPoly)
+    # cx, cy = gc.centeroidnp(starredPoly)
+    # print("Centroid:", (cx, cy))
+    # print("Centroid in polygon:", gc.pip(Point(cx, cy), starredPoly))
+    # plt.grid(0.5)
+    # plt.scatter(cx, cy, c='g')
+    # gc.plotPolygon(starredPoly)
 
