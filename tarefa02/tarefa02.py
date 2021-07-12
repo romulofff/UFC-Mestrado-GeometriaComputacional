@@ -1,12 +1,19 @@
 import math
+from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy.random import poisson
 
 
 class Point():
+    """Data structure of a point."""
     def __init__(self, x, y) -> None:
+        """Point object
+
+        Args:
+            x (float): x coordinate of point
+            y (float): y coordinate of point
+        """
         self.x = x
         self.y = y
 
@@ -201,6 +208,13 @@ class Gcrf():
         return sum_x/length, sum_y/length
 
     def plotPolygon(self, points):
+        """Plot polygon from list of points
+
+        Args:
+            points (Point): list of Point objects indicating the polygon vertices
+        """
+
+        points.append(points[0])
         if type(points[0]) == Point:
             points = [p() for p in points]
         x, y = zip(*points)
@@ -208,24 +222,28 @@ class Gcrf():
         plt.plot(x, y, '-o')
         plt.show()
 
-    # def rotationIndex(self, p: Point, poly: list):
-    #     j = len(poly)-1
-    #     rotIndex = 0
-    #     for i in range(len(poly)):
-    #         ppi = self.subtrvetorial(p, poly[j])
-    #         ppi1 = self.subtrvetorial(p, poly[i])
-    #         print("ppi:", ppi, "pppi1", ppi1)
-    #         rotIndex += self.pseudoAngulo2(ppi, ppi1)
-    #         print("rotIndex",rotIndex)
-    #         j = i
-    #     # print(rotIndex)
-    #     rotIndex *= 1/(2*math.pi)
-    #     print(rotIndex)
-    #     if rotIndex == 0:
-    #         return False
-    #     if abs(rotIndex) == 1:
-    #         return True
-    #     return rotIndex
+    def plotSegment(self, segments: List[Point]) -> None:
+        for segment in segments:
+            segx = [p.x for p in segment]
+            segy = [p.y for p in segment]
+            plt.plot(segx, segy)
+        plt.show()
+
+    def rotationIndex(self, p: Point, poly: list):
+        # NOT WORKING
+        j = len(poly)-1
+        rotIndex = 0
+        for i in range(len(poly)):
+            ppi = self.subtrvetorial(p, poly[j])
+            ppi1 = self.subtrvetorial(p, poly[i])
+            rotIndex += self.pseudoAngulo2(ppi, ppi1)
+            j = i
+        rotIndex *= 1/(2*math.pi)
+        if rotIndex == 0:
+            return False
+        if abs(rotIndex) == 1:
+            return True
+        return rotIndex
 
 
 if __name__ == '__main__':
@@ -254,22 +272,32 @@ if __name__ == '__main__':
     # print("Se positivo a está a esquerda de b:",
     #       gc.pseudoAngulo2([1, -1], [1, 1]))
 
-    # print("Interseção dos segmentos de retas: ",
-    #       gc.intersect((0, 0), (2, 2), (0, 1), (2, 1)))
-    # print("Interseção dos segmentos de retas: ",
-    #       gc.intersect((0, 0), (2, 2), (0, 6), (9, -3)))
-    # print("Interseção dos segmentos de retas: ",
-    #       gc.intersect((0, -2), (6, 4), (0, 6), (9, -3)))
+    print("Interseção dos segmentos de retas: ",
+          gc.intersect((0, 0), (2, 2), (0, 1), (2, 1)))
+    gc.plotSegment([[Point(0, 0), Point(2, 2)], [Point(0, 1), Point(2, 1)]])
 
-    # print(gc.antiHorario([(0, 0), (0, 1), (2, 0)]))
-    # print(gc.antiHorario([(0, 0), (2, 0), (0, 1)]))
-    # print(gc.area((0, 1), (2, 0)))
-    # print(gc.area((0, 1, 3), (2, 0, 4)))
+    print("Interseção dos segmentos de retas: ",
+          gc.intersect((0, 0), (2, 2), (0, 6), (9, -3)))
+    gc.plotSegment([[Point(0, 0), Point(2, 2)], [Point(0, 6), Point(9, -3)]])
 
-    # print("PIP:", gc.pip(Point(0, 0), [
-    #       Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)]))
-    # print("PIP:", gc.pip(Point(2, 2), [
-    #       Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)]))
+    print("Interseção dos segmentos de retas: ",
+          gc.intersect((0, -2), (6, 4), (0, 6), (9, -3)))
+    gc.plotSegment([[Point(0, -2), Point(6, 4)], [Point(0, 6), Point(9, -3)]])
+
+    print(gc.antiHorario([(0, 0), (0, 1), (2, 0)]))
+    print(gc.antiHorario([(0, 0), (2, 0), (0, 1)]))
+    print(gc.area((0, 1), (2, 0)))
+    print(gc.area((0, 1, 3), (2, 0, 4)))
+
+    print("PIP:", gc.pip(Point(0, 0), [
+          Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)]))
+    plt.scatter(0,0, c='g')
+    gc.plotPolygon([Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)])
+
+    print("PIP:", gc.pip(Point(2, 2), [
+          Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)]))
+    plt.scatter(2,2,c='g')
+    gc.plotPolygon([Point(-1, 1), Point(1, 1), Point(1, -1), Point(-1, -1)])
 
     poly = [Point(-1, 1), Point(1, 1), Point(3, 1),
             Point(4, 2), Point(2.5, 3), Point(1.5, 3.5),
@@ -280,16 +308,15 @@ if __name__ == '__main__':
     #         Point(0.38, 0.6), Point(0.18, 0.6), Point(0.26, 0.46), Point(0, 0.28)]
 
     starredPoly = gc.starPolygon(poly, 2)
-    gc.plotPolygon(starredPoly)
 
     cx, cy = gc.centeroidnp(starredPoly)
     print("Centroid:", (cx, cy))
     print("Centroid in polygon:", gc.pip(Point(cx, cy), starredPoly))
-    plt.grid(0.9)
     x, y = zip(*[p() for p in starredPoly])
 
-    plt.plot(x, y, '-o')
+    plt.grid(0.9)
+    # plt.plot(x, y, '-o')
     plt.scatter(cx, cy, c='g')
-    plt.show()
-    # gc.plotPolygon(starredPoly)
+    # plt.show()
+    gc.plotPolygon(starredPoly)
 
