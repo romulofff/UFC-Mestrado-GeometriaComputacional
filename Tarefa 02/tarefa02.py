@@ -2,6 +2,7 @@ import math
 
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy.random import poisson
 
 
 class Point():
@@ -147,15 +148,13 @@ class Gcrf():
         return 0.5*res > 0
 
     def slope(self, p1: Point, p2: Point):
-
         return (p2.y - p1.y) / (p2.x - p1.x)
 
     def pip(self, p: Point, poly) -> bool:
         """ Determine if the point is in the polygon.
 
         Args:
-            x -- The x coordinates of point.
-            y -- The y coordinates of point.
+            p -- a object of type Point(x, y)
             poly -- a list of tuples [(x, y), (x, y), ...]
 
         Returns:
@@ -182,9 +181,9 @@ class Gcrf():
         while i < jumps:
             for j in range(i, len(points), jumps):
                 # print("Ponto adicionado j:",points[j]())
-                starredPolygon.append(points[j]())
+                starredPolygon.append(points[j])
             # print("Ponto adicionado i:",points[i]())
-            starredPolygon.append(points[i]())
+            starredPolygon.append(points[i])
             i += 1
         return starredPolygon
 
@@ -202,6 +201,8 @@ class Gcrf():
         return sum_x/length, sum_y/length
 
     def plotPolygon(self, points):
+        if type(points[0]) == Point:
+            points = [p() for p in points]
         x, y = zip(*points)
         plt.grid(0.9)
         plt.plot(x, y, '-o')
@@ -277,11 +278,19 @@ if __name__ == '__main__':
     # poly = [Point(0.2, 0.2), Point(0.3, 0.2), Point(0.4, 0.2),
     #         Point(0.5, 0.3), Point(0.45, 0.4), Point(0.36, 0.45),
     #         Point(0.38, 0.6), Point(0.18, 0.6), Point(0.26, 0.46), Point(0, 0.28)]
-    # newpoly = [p() for p in poly]
-    # newx, newy = zip(*newpoly)
 
     starredPoly = gc.starPolygon(poly, 2)
     print(starredPoly)
-    cx, cy = gc.centeroidnp(starredPoly)
-    print(cx, cy)
     gc.plotPolygon(starredPoly)
+
+    cx, cy = gc.centeroidnp(starredPoly)
+    print("Centroid:", (cx, cy))
+    print("Centroid in polygon:", gc.pip(Point(cx, cy), starredPoly))
+    plt.grid(0.9)
+    x, y = zip(*[p() for p in starredPoly])
+
+    plt.plot(x, y, '-o')
+    plt.scatter(cx, cy, c='g')
+    plt.show()
+    # gc.plotPolygon(starredPoly)
+
