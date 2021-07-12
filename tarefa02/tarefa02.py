@@ -280,7 +280,6 @@ if __name__ == '__main__':
     #         Point(0.38, 0.6), Point(0.18, 0.6), Point(0.26, 0.46), Point(0, 0.28)]
 
     starredPoly = gc.starPolygon(poly, 2)
-    print(starredPoly)
     gc.plotPolygon(starredPoly)
 
     cx, cy = gc.centeroidnp(starredPoly)
