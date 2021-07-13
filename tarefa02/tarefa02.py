@@ -335,7 +335,7 @@ if __name__ == '__main__':
 
     a = (1, 1)
     b = (1, -1)
-    print("Se o pseudo-ângulo for positivo {} está à esquerda de {}:".format(a, b),
+    print("Se o pseudo-ângulo for positivo {} está à esquerda de {}:".format(b, a),
           gc.pseudoAngulo2(a, b))
     print("Se o pseudo-ângulo for positivo {} está à esquerda de {}:".format(a, b),
           gc.pseudoAngulo2(b, a))
