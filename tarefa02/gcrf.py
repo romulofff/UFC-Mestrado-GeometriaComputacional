@@ -43,7 +43,7 @@ class Gcrf():
         z = zip(xn, yn)
         z = [Point(x, y) for x, y in z]
         z = np.array(z)
-        angles = [self.anguloOrientado(i) for i in z]
+        angles = [self.pseudoAnguloOrientado(i) for i in z]
         indexes = np.argsort(angles)
         z = z[indexes]
         z = z.tolist()
@@ -126,7 +126,19 @@ class Gcrf():
             return mult*math.acos(x[0]/self.norma(x))
         return mult*math.acos(x[0]/self.norma(x))*(180/math.pi)
 
-    def pseudoAnguloCosseno(self, x, y, degrees=False):
+    def pseudoAngulo(self, x, degrees=False):
+        if isinstance(x, Point):
+            x = x()
+        mult = 1
+        if x[1] < 0:
+            mult = -1
+        if not degrees:
+            return mult*(1-(x[0]/self.norma(x)))
+        return mult*(1-(x[0]/self.norma(x)))*(180/math.pi)
+
+    def pseudoAnguloCosseno(self, x, y=[0,0], degrees=False):
+        if isinstance(x, Point):
+            x = x()
         if not degrees:
             return 1-(self.prodescalar(x, y)/(self.norma(x)*self.norma(y)))
         return (1-(self.prodescalar(x, y)/(self.norma(x)*self.norma(y))))*(180/math.pi)
@@ -151,7 +163,7 @@ class Gcrf():
         return 8-(-x[1]/x[0])
 
     def pseudoAngulo2(self, x, y):
-        return self.pseudoAnguloOrientado(x)-self.pseudoAnguloOrientado(y)
+        return self.pseudoAnguloOrientado(y)-self.pseudoAnguloOrientado(x)
 
     def prodvetorial(self, x, y):
         if len(x) == 2:
@@ -238,6 +250,15 @@ class Gcrf():
         sum_y = np.sum(arr[:, 1])
         return sum_x/length, sum_y/length
 
+    def plotPoint(self, p: Point):
+        plt.scatter(p.x,p.y)
+        plt.show()
+
+    def plotPoints(self, p: List[Point]):
+        for point in p:
+            self.plotPoint(point)
+        plt.show()
+
     def plotPolygon(self, points, annotate=False):
         """Plot polygon from list of points
 
@@ -257,12 +278,30 @@ class Gcrf():
             plt.text(x[2], y[2], "p3")
         plt.show()
 
-    def plotSegment(self, segments: List[Point]) -> None:
+    def plotSegment(self, segments: List[Point], threeD=False) -> None:
+        if threeD:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+                
         for segment in segments:
             segx = [p.x for p in segment]
             segy = [p.y for p in segment]
-            plt.plot(segx, segy)
+            if threeD:
+                segz = [p.z for p in segment]
+                ax.plot(segx, segy, segz)
+            else:
+                plt.plot(segx, segy)
         plt.show()
+
+    def plotSquare(self):
+        x = [1, 1, -1, -1, 1]
+        y = [1, -1, -1, 1, 1]
+        plt.plot(x, y)
+
+    def plotAxis(self):
+        plt.grid()
+        plt.axhline(y=0, color='k')
+        plt.axvline(x=0, color='k')
 
     def rotationIndex(self, p: Point, poly: list):
         # NOT WORKING
