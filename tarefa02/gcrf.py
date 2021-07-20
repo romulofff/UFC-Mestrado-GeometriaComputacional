@@ -19,6 +19,11 @@ class Point():
         self.y = y
         self.z = z
 
+    def __iter__(self):
+        yield self.x
+        yield self.y
+        yield self.z
+
     def __len__(self):
         return 3
 
@@ -36,10 +41,13 @@ class Edge:
     def __init__(self, p1, p2):
         self.p1 = p1
         self.p2 = p2
+        self.processed = False
 
     def __str__(self):
         return "[" + str(self.p1) + " -> " + str(self.p2) + "]"
 
+    def is_processed(self):
+        self.processed = True
 
 class Face:
     def __init__(self, e1, e2, e3):
