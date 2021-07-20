@@ -20,37 +20,53 @@ class Point():
         self.z = z
 
     def __len__(self):
-        if self.z == 0:
-            return 2
-        else:
-            return 3
+        return 3
 
     def __call__(self) -> tuple:
-        return (self.x, self.y)
+        return (self.x, self.y, self.z)
 
     def __str__(self) -> str:
-        return str((self.x, self.y))
+        return str((self.x, self.y, self.z))
 
     def to_numpy(self):
         return np.array([self.x, self.y])
 
 
+class Edge:
+    def __init__(self, p1, p2):
+        self.p1 = p1
+        self.p2 = p2
+
+    def __str__(self):
+        return "[" + str(self.p1) + " -> " + str(self.p2) + "]"
+
+
+class Face:
+    def __init__(self, e1, e2, e3):
+        self.e1 = e1
+        self.e2 = e2
+        self.e3 = e3
+
+    def __str__(self):
+        return "{" + str(self.e1) + ", " + str(self.e2) + ", " + str(self.e3) + "}"
+
+
 class Gcrf():
 
-    def genPoly(self, n):
+    def gen_poly(self, n):
         xn = np.random.random(n)
         yn = np.random.random(n)
         z = zip(xn, yn)
         z = [Point(x, y) for x, y in z]
         z = np.array(z)
-        angles = [self.pseudoAnguloOrientado(i) for i in z]
+        angles = [self.pseudo_angulo_orientado(i) for i in z]
         indexes = np.argsort(angles)
         z = z[indexes]
         z = z.tolist()
 
         return z
 
-    def somavetorial(self, a, b):
+    def soma_vetorial(self, a, b):
         if isinstance(a, Point):
             return Point(a.x+b.x, a.y+b.y, a.z+b.z)
         z = []
@@ -58,7 +74,7 @@ class Gcrf():
             z.append(a[i]+b[i])
         return z
 
-    def subtrvetorial(self, a, b):
+    def subtr_vetorial(self, a, b):
         if isinstance(a, Point):
             return Point(a.x-b.x, a.y-b.y, a.z-b.z)
         z = []
@@ -66,7 +82,7 @@ class Gcrf():
             z.append(a[i]-b[i])
         return z
 
-    def multescalar(self, lamb: int, x: list) -> list:
+    def multi_escalar(self, lamb: int, x: list) -> list:
         # if isinstance(a, Point):
         #     return Point(a.x*lamb, a.y*lamb, a.z*lamb)
         z = []
@@ -74,7 +90,15 @@ class Gcrf():
             z.append(lamb*x[i])
         return z
 
-    def prodescalar(self, a, b):
+    def prod_escalar(self, a, b):
+        aIsPoint = isinstance(a, Point)
+        bIsPoint = isinstance(b, Point)
+        if aIsPoint and bIsPoint:
+            return sum([a.x*b.x, a.y*b.y, a.z*b.z])
+        if aIsPoint:
+            a = a()
+        if bIsPoint:
+            b = b()
         res = []
         for i in range(len(a)):
             res.append(a[i]*b[i])
@@ -113,10 +137,10 @@ class Gcrf():
         """
 
         if not degrees:
-            return math.acos(self.prodescalar(x, y)/(self.norma(x)*self.norma(y)))
-        return math.acos(self.prodescalar(x, y)/(self.norma(x)*self.norma(y)))*(180/math.pi)
+            return math.acos(self.prod_escalar(x, y)/(self.norma(x)*self.norma(y)))
+        return math.acos(self.prod_escalar(x, y)/(self.norma(x)*self.norma(y)))*(180/math.pi)
 
-    def anguloOrientado(self, x, degrees=False):
+    def angulo_orientado(self, x, degrees=False):
         if isinstance(x, Point):
             x = x()
         mult = 1
@@ -126,7 +150,7 @@ class Gcrf():
             return mult*math.acos(x[0]/self.norma(x))
         return mult*math.acos(x[0]/self.norma(x))*(180/math.pi)
 
-    def pseudoAngulo(self, x, degrees=False):
+    def pseudo_angulo(self, x, degrees=False):
         if isinstance(x, Point):
             x = x()
         mult = 1
@@ -136,14 +160,14 @@ class Gcrf():
             return mult*(1-(x[0]/self.norma(x)))
         return mult*(1-(x[0]/self.norma(x)))*(180/math.pi)
 
-    def pseudoAnguloCosseno(self, x, y=[0,0], degrees=False):
+    def pseudo_angulo_cosseno(self, x, y=[0, 0], degrees=False):
         if isinstance(x, Point):
             x = x()
         if not degrees:
-            return 1-(self.prodescalar(x, y)/(self.norma(x)*self.norma(y)))
-        return (1-(self.prodescalar(x, y)/(self.norma(x)*self.norma(y))))*(180/math.pi)
+            return 1-(self.prod_escalar(x, y)/(self.norma(x)*self.norma(y)))
+        return (1-(self.prod_escalar(x, y)/(self.norma(x)*self.norma(y))))*(180/math.pi)
 
-    def pseudoAnguloOrientado(self, x):
+    def pseudo_angulo_orientado(self, x):
         if isinstance(x, Point):
             x = x()
         if x[1] >= 0:
@@ -162,39 +186,52 @@ class Gcrf():
             return 6+(x[0]/-x[1])
         return 8-(-x[1]/x[0])
 
-    def pseudoAngulo2(self, x, y):
-        return self.pseudoAnguloOrientado(y)-self.pseudoAnguloOrientado(x)
+    def pseudo_angulo_2(self, x, y):
+        return self.pseudo_angulo_orientado(y)-self.pseudo_angulo_orientado(x)
 
-    def prodvetorial(self, x, y):
-        if len(x) == 2:
-            return x[0]*y[1]-x[1]*y[0]
-        return [x[1]*y[2]-x[2]*y[2], x[2]*y[0]-x[0]*y[2], x[0]*y[1]-x[1]*y[0]]
+    def prod_vetorial(self, a, b):
+        if len(a) == 2:
+            return a.x*b.y-a.y*b.x
+        return [a.y*b.z-a.z*b.z, a.z*b.x-a.x*b.z, a.x*b.y-a.y*b.x]
 
     def intersect(self, a, b, c, d):
-        ab = self.subtrvetorial(b, a)
-        ac = self.subtrvetorial(c, a)
-        ad = self.subtrvetorial(d, a)
-        ca = self.subtrvetorial(a, c)
-        cb = self.subtrvetorial(b, c)
-        cd = self.subtrvetorial(d, c)
+        ab = self.subtr_vetorial(b, a)
+        ac = self.subtr_vetorial(c, a)
+        ad = self.subtr_vetorial(d, a)
+        ca = self.subtr_vetorial(a, c)
+        cb = self.subtr_vetorial(b, c)
+        cd = self.subtr_vetorial(d, c)
 
-        # r1 = self.prodvetorial(ab, ac)*self.prodvetorial(ab, ad)
-        r1 = self.prodvetorial(ab, ac)*self.prodvetorial(ab, ad) < 0
-        # r2 = self.prodvetorial(cd, ca)*self.prodvetorial(cd, cb)
-        r2 = self.prodvetorial(cd, ca)*self.prodvetorial(cd, cb) < 0
+        # r1 = self.prod_vetorial(ab, ac)*self.prod_vetorial(ab, ad)
+        r1 = self.prod_vetorial(ab, ac)*self.prod_vetorial(ab, ad) < 0
+        # r2 = self.prod_vetorial(cd, ca)*self.prod_vetorial(cd, cb)
+        r2 = self.prod_vetorial(cd, ca)*self.prod_vetorial(cd, cb) < 0
         # return (r1, r2), r1 < 0 and r2 < 0
         return r1 and r2
 
+    def square_area(self, p1: Point, p2: Point, p3: Point):
+        res = self.prod_vetorial(self.subtr_vetorial(
+            p2, p1), self.subtr_vetorial(p3, p1))
+        res = sum([i**2 for i in res])
+        return 0.5*res
+
     def area(self, x, y):
         if len(x) == 2:
-            return abs(self.prodvetorial(x, y))
-        return self.norma(self.prodvetorial(x, y))
+            return abs(self.prod_vetorial(x, y))
+        return self.norma(self.prod_vetorial(x, y))
+
+    def signed_volume(self, p1: Point, p2: Point, p3: Point, p4: Point):
+        v1 = self.subtr_vetorial(p2, p1)
+        v2 = self.subtr_vetorial(p3, p1)
+        v3 = self.subtr_vetorial(p4, p1)
+        res = self.prod_vetorial(v1, v2)
+        return self.prod_escalar(v3, res)/6
 
     def antiHorario(self, listaDePontos):
         res = 0
         for i in range(len(listaDePontos)-1):
-            res += self.prodvetorial(listaDePontos[i], listaDePontos[i+1])
-        res += self.prodvetorial(listaDePontos[0], listaDePontos[-1])
+            res += self.prod_vetorial(listaDePontos[i], listaDePontos[i+1])
+        res += self.prod_vetorial(listaDePontos[0], listaDePontos[-1])
         return 0.5*res > 0
 
     def slope(self, p1: Point, p2: Point):
@@ -251,7 +288,7 @@ class Gcrf():
         return sum_x/length, sum_y/length
 
     def plotPoint(self, p: Point):
-        plt.scatter(p.x,p.y)
+        plt.scatter(p.x, p.y)
         plt.show()
 
     def plotPoints(self, p: List[Point]):
@@ -282,7 +319,7 @@ class Gcrf():
         if threeD:
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
-                
+
         for segment in segments:
             segx = [p.x for p in segment]
             segy = [p.y for p in segment]
@@ -308,9 +345,9 @@ class Gcrf():
         j = len(poly)-1
         rotIndex = 0
         for i in range(len(poly)):
-            ppi = self.subtrvetorial(p, poly[j])
-            ppi1 = self.subtrvetorial(p, poly[i])
-            rotIndex += self.pseudoAngulo2(ppi, ppi1)
+            ppi = self.subtr_vetorial(p, poly[j])
+            ppi1 = self.subtr_vetorial(p, poly[i])
+            rotIndex += self.pseudo_angulo_2(ppi, ppi1)
             j = i
         rotIndex *= 1/(2*math.pi)
         if rotIndex == 0:
