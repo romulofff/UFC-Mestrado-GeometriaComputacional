@@ -33,6 +33,9 @@ class Point():
     def __str__(self) -> str:
         return str((self.x, self.y, self.z))
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
     def to_numpy(self):
         return np.array([self.x, self.y])
 
@@ -41,13 +44,13 @@ class Edge:
     def __init__(self, p1, p2):
         self.p1 = p1
         self.p2 = p2
-        self.processed = False
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
     def __str__(self):
         return "[" + str(self.p1) + " -> " + str(self.p2) + "]"
 
-    def is_processed(self):
-        self.processed = True
 
 class Face:
     def __init__(self, e1, e2, e3):
