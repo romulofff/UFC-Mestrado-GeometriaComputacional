@@ -46,10 +46,18 @@ class Edge:
         self.p2 = p2
 
     def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+        # return self.__dict__ == other.__dict__
+        if self.p1 == other.p1 or self.p1 == other.p2:
+            if self.p2 == other.p1 or self.p2 == other.p2:
+                return True
+        return False
 
     def __str__(self):
         return "[" + str(self.p1) + " -> " + str(self.p2) + "]"
+
+    def __call__(self):
+        # return "[" + str(self.p1) + " -> " + str(self.p2) + "]"
+        return (self.p1(), self.p2())
 
 
 class Face:
@@ -60,6 +68,17 @@ class Face:
 
     def __str__(self):
         return "{" + str(self.e1) + ", " + str(self.e2) + ", " + str(self.e3) + "}"
+
+    def __call__(self):
+        # return "{" + str(self.e1) + ", " + str(self.e2) + ", " + str(self.e3) + "}"
+        return self.e1.p1(), self.e1.p2(), self.e3.p1()
+
+    def __eq__(self, other):
+        if self.e1 == other.e1 or self.e1 == other.e2 or self.e2 == other.e3:
+            if self.e2 == other.e1 or self.e2 == other.e2 or self.e2 == other.e3:
+                if self.e3 == other.e1 or self.e3 == other.e2 or self.e3 == other.e3:
+                    return True
+        return False
 
 
 class Gcrf():
@@ -203,7 +222,7 @@ class Gcrf():
     def prod_vetorial(self, a, b):
         if len(a) == 2:
             return a.x*b.y-a.y*b.x
-        return [a.y*b.z-a.z*b.z, a.z*b.x-a.x*b.z, a.x*b.y-a.y*b.x]
+        return [a.y*b.z-a.z*b.y, a.z*b.x-a.x*b.z, a.x*b.y-a.y*b.x]
 
     def intersect(self, a, b, c, d):
         ab = self.subtr_vetorial(b, a)
@@ -350,6 +369,10 @@ class Gcrf():
         plt.grid()
         plt.axhline(y=0, color='k')
         plt.axvline(x=0, color='k')
+
+
+    # def plot_faces(self, F):
+
 
     def rotationIndex(self, p: Point, poly: list):
         # NOT WORKING
