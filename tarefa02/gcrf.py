@@ -48,10 +48,10 @@ class Edge:
     def __eq__(self, other):
         # return self.__dict__ == other.__dict__
         if self.p1 == other.p1 or self.p1 == other.p2:
-            if self.p2 == other.p1 or self.p2 == other.p2:
-                return True
+           if self.p2 == other.p1 or self.p2 == other.p2:
+               return True
         return False
-
+    
     def __str__(self):
         return "[" + str(self.p1) + " -> " + str(self.p2) + "]"
 
@@ -79,6 +79,14 @@ class Face:
                 if self.e3 == other.e1 or self.e3 == other.e2 or self.e3 == other.e3:
                     return True
         return False
+        # p1, p2, p3 = self()
+        # p1_, p2_, p3_ = other()
+
+        # if p1 == p1_ or p1 == p2_ or p1 == p3_:
+        #     if p2 == p1_ or p2 == p2_ or p2 == p3_:
+        #         if p3 == p1_ or p3 == p2_ or p3 == p3_:
+        #             return True
+        # return False
 
 
 class Gcrf():
