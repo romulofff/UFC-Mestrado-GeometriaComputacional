@@ -143,9 +143,6 @@ class Gcrf():
         return sum(res)
 
     def norma(self, a):
-        # print(a)
-        # for i in range(len(x)):
-            # norm += x[i]**2
         norm = a.x**2 + a.y**2 + a.z**2
         return math.sqrt(norm)
 
@@ -178,7 +175,6 @@ class Gcrf():
         # if not degrees:
         #     return math.acos(self.prod_escalar(x, y)/(self.norma(x)*self.norma(y)))
         # return math.acos(self.prod_escalar(x, y)/(self.norma(x)*self.norma(y)))*(180/math.pi)
-        # print(x, y)
         if not degrees:
             return self.prod_escalar(x, y)/(self.norma(x)*self.norma(y))
         return self.prod_escalar(x, y)/(self.norma(x)*self.norma(y))*(180/math.pi)
@@ -211,7 +207,6 @@ class Gcrf():
         return (1-(self.prod_escalar(x, y)/(self.norma(x)*self.norma(y))))*(180/math.pi)
 
     def pseudo_angulo_orientado(self, x):
-        # print("X do pseudoângulo",x)
         if isinstance(x, Point):
             x = x()
         if x[1] >= 0:
