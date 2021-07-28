@@ -142,11 +142,9 @@ class Gcrf():
             res.append(a[i]*b[i])
         return sum(res)
 
-    def norma(self, x):
-        z = 0
-        for i in range(len(x)):
-            z += x[i]**2
-        return math.sqrt(z)
+    def norma(self, a):
+        norm = a.x**2 + a.y**2 + a.z**2
+        return math.sqrt(norm)
 
     def distancia(self, x, y):
         """Returns the distance between vectors x and y.
@@ -174,9 +172,12 @@ class Gcrf():
             float: the angle between the two vectors
         """
 
+        # if not degrees:
+        #     return math.acos(self.prod_escalar(x, y)/(self.norma(x)*self.norma(y)))
+        # return math.acos(self.prod_escalar(x, y)/(self.norma(x)*self.norma(y)))*(180/math.pi)
         if not degrees:
-            return math.acos(self.prod_escalar(x, y)/(self.norma(x)*self.norma(y)))
-        return math.acos(self.prod_escalar(x, y)/(self.norma(x)*self.norma(y)))*(180/math.pi)
+            return self.prod_escalar(x, y)/(self.norma(x)*self.norma(y))
+        return self.prod_escalar(x, y)/(self.norma(x)*self.norma(y))*(180/math.pi)
 
     def angulo_orientado(self, x, degrees=False):
         if isinstance(x, Point):
@@ -230,7 +231,7 @@ class Gcrf():
     def prod_vetorial(self, a, b):
         if len(a) == 2:
             return a.x*b.y-a.y*b.x
-        return [a.y*b.z-a.z*b.y, a.z*b.x-a.x*b.z, a.x*b.y-a.y*b.x]
+        return Point(a.y*b.z-a.z*b.y, a.z*b.x-a.x*b.z, a.x*b.y-a.y*b.x)
 
     def intersect(self, a, b, c, d):
         ab = self.subtr_vetorial(b, a)

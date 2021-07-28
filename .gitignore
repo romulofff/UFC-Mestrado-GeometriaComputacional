@@ -1,6 +1,5 @@
 *.pdf
 *.mtl
-*.obj
 *.whl
 *.zip
 
@@ -14,3 +13,4 @@ src/
 */.ipynb_checkpoints
 GC 2021-20210713T194954Z-001/
 .ipynb_checkpoints/
+FechoConvexo/
