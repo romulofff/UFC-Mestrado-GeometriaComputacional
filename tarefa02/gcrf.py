@@ -233,20 +233,12 @@ class Gcrf():
             return a.x*b.y-a.y*b.x
         return Point(a.y*b.z-a.z*b.y, a.z*b.x-a.x*b.z, a.x*b.y-a.y*b.x)
 
-    def intersect(self, a, b, c, d):
-        ab = self.subtr_vetorial(b, a)
-        ac = self.subtr_vetorial(c, a)
-        ad = self.subtr_vetorial(d, a)
-        ca = self.subtr_vetorial(a, c)
-        cb = self.subtr_vetorial(b, c)
-        cd = self.subtr_vetorial(d, c)
+    def ccw(self, A,B,C):
+        return (C.y-A.y) * (B.x-A.x) > (B.y-A.y) * (C.x-A.x)
 
-        # r1 = self.prod_vetorial(ab, ac)*self.prod_vetorial(ab, ad)
-        r1 = self.prod_vetorial(ab, ac)*self.prod_vetorial(ab, ad) < 0
-        # r2 = self.prod_vetorial(cd, ca)*self.prod_vetorial(cd, cb)
-        r2 = self.prod_vetorial(cd, ca)*self.prod_vetorial(cd, cb) < 0
-        # return (r1, r2), r1 < 0 and r2 < 0
-        return r1 and r2
+    # Return true if line segments AB and CD intersect
+    def intersect(self,A,B,C,D):
+        return self.ccw(A,C,D) != self.ccw(B,C,D) and self.ccw(A,B,C) != self.ccw(A,B,D)
 
     def square_area(self, p1: Point, p2: Point, p3: Point):
         res = self.prod_vetorial(self.subtr_vetorial(
