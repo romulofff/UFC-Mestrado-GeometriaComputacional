@@ -31,6 +31,8 @@ def draw_map(colormap):
             0xFF00FFFF,
             0x00FFFFFF,
             0xFFFFFFFF,
+            0xFFDDDCCA,
+            0x123D432A
             ])
 
     colormap = numpy.transpose(colormap)
@@ -42,9 +44,10 @@ def draw_map(colormap):
     pixels[:,:,0] = (palette[colormap]>>24) & 0xFF
 
     image = Image.frombytes("RGBA",shape,pixels)
-    image.save('voronoi.png')
+    image.save('voronoi2.png')
 
 if __name__ == '__main__':
-    draw_map(voronoi(([100,300], [200,500], [300,200], [400,500], [500,300], [200,300])))
+    # draw_map(voronoi(([100,300], [200,500], [300,200], [400,500], [500,300], [200,300])))
+    draw_map(voronoi(([100,300], [200,500], [300,200], [400,500], [500,300], [245, 431], [105, 381], [444, 333], [200,300])))
 #     draw_map(voronoi(([100,100],[356,301],[400,65],[324,145],
 # [200,399])))
