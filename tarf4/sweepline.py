@@ -1,12 +1,10 @@
 import os
 import math
 import time
-from collections import deque
 from typing import List
 
 import numpy as np
 import matplotlib.pyplot as plt
-from numpy.core.fromnumeric import sort
 
 from shapely.geometry import Polygon
 
