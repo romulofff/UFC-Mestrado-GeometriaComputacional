@@ -78,14 +78,18 @@ class Face():
 def diag_in_hull(diag, hull):
     return True
 
-def add_edge_to_hull(edge, hull):
+def split_hull_on_edge(edge, hull):
     pass
 
+# not working
 def diagonal_triangulation(hull):
     first_point = hull[0]
 
     for i in range(len(hull)-1):
         diag = Edge(hull[1], hull[i])
         if diag_in_hull(diag, hull):
-            hull = add_edge_to_hull(diag, hull)
-            # ITERATE RECURSIVELY ON DOMAIN
+            hull_a, hull_b = split_hull_on_edge(diag, hull)
+            face_1 = diagonal_triangulation(hull_a)
+            face_2 = diagonal_triangulation(hull_b)
+
+            return face_1, face_2

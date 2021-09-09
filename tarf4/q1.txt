@@ -1,0 +1,1 @@
+Q1: a) É possível calcular a triangulação de um domínio em O(n logn) utilizando um algoritmo de Triangulação de Delaunay. Em seguida, podemos verificar para cada triângulo, se o ponto pertence a ele em tempo O(n). Dessa forma, se o ponto não pertencer a nenhum triângulo, ele não pertence ao polígono original. Caso contrário, pertence.
